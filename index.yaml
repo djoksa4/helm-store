@@ -3,6 +3,19 @@ entries:
   GHA-GitOps-project-app:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2024-10-29T20:26:47.0012216Z"
+    description: A Helm chart for deploying the GHA-GitOps-project-app on Kubernetes.
+    digest: 4f37f7178945095b168e29882f33e62487feeef4f5fc06be2ec023ad8b6ed807
+    home: https://github.com/djoksa4/GHA-GitOps-project-app
+    name: GHA-GitOps-project-app
+    sources:
+    - https://github.com/djoksa4/GHA-GitOps-project-app
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/djoksa4/helm-store/develop/helm/GHA-GitOps-project-app-0.1.9.tgz
+    version: 0.1.9
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2024-10-29T00:23:11.555281801Z"
     description: A Helm chart for deploying the GHA-GitOps-project-app on Kubernetes.
     digest: 8c8b4f971b56673de16e37b7d67677b889acc4e1bb414cffef82ec751dda16d2
@@ -14,4 +27,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/djoksa4/helm-store/develop/helm/GHA-GitOps-project-app-0.1.8.tgz
     version: 0.1.8
-generated: "2024-10-29T00:23:11.554658299Z"
+generated: "2024-10-29T20:26:47.000609342Z"
