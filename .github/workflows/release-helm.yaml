@@ -53,59 +53,66 @@ jobs:
         with:
           version: 'v3.11.1'
 
-      - name: Update New Files and push to dest branch 
-        shell: bash
-        working-directory: src
-        run: |
-            set -e
+      # - name: Prepare Helm package release 
+      #   shell: bash
+      #   working-directory: src
+      #   run: |
+      #       set -e
 
-            # enable advanced pattern matching, exclusion patterns during file copying (eg. !(index.yaml))
-            shopt -s extglob
+      #       # enable advanced pattern matching, exclusion patterns during file copying (eg. !(index.yaml))
+      #       shopt -s extglob
             
-            # list of files modified in the app directory for the current commit
-            # ensures that only the files packaged in this commit are processed
-            file_list=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} -- ./app)
+      #       # list of files modified in the app directory for the current commit (compared to the previous commit)
+      #       # ensures that only the files packaged in this commit are processed (outputs relative file paths of these files)
+      #       file_list=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} -- ./app)
             
-            mkdir -p aux_dir
+      #       mkdir -p aux_dir
             
-            # move these new files to aux_dir
-            for file in $file_list; do
-              echo "file: ${file}"
-              if [ -f "$file" ]; then
-                  mv "$file" ./aux_dir
-              else
-                  echo "Error: File '$file' does not exist."
-              fi
-            done
+      #       # move these new files to aux_dir
+      #       for file in $file_list; do
+      #         echo "file: ${file}"
+      #         if [ -f "$file" ]; then
+      #             mv "$file" ./aux_dir
+      #         else
+      #             echo "Error: File '$file' does not exist."
+      #         fi
+      #       done
             
-            # needed to serve files directly from GitHub repo as if they were hosted on a web server
-            url=$(echo "https://raw.githubusercontent.com/djoksa4/helm-store/${{ steps.dest-branch.outputs.DEST_BRANCH }}/helm/")
+      #       # raw content URL needed to serve files directly from GitHub repo as if they were hosted on a web server
+      #       url=$(echo "https://raw.githubusercontent.com/djoksa4/helm-store/${{ steps.dest-branch.outputs.DEST_BRANCH }}/helm/")
             
-            # generate/Update index.yaml in aux_dir, linking each .tgz file with its raw GitHub URL
-            # prepares dest with updated .tgz packages and an updated index.yaml
-            if [ -n "$(find ./aux_dir -type f -name '*.tgz')" ]; then
-              if ! helm repo index ./aux_dir --merge ../dest/index.yaml --url $url; then
-                echo "Error: Failed to generate repository index."
-                exit 1
-              fi
+      #       # generate/Update index.yaml in aux_dir, linking each .tgz file with its raw GitHub URL
+      #       # prepares dest with updated .tgz packages and an updated index.yaml
+      #       if [ -n "$(find ./aux_dir -type f -name '*.tgz')" ]; then
+      #         if ! helm repo index ./aux_dir --merge ../dest/index.yaml --url $url; then
+      #           echo "Error: Failed to generate repository index."
+      #           exit 1
+      #         fi
               
               
-              mkdir -p ../dest/helm
+      #         mkdir -p ../dest/helm
               
-              echo "Copying files..."              
+      #         echo "Copying files..."              
 
-              if ! cp -pr ./aux_dir/!(index.yaml) ../dest/helm/; then
-                  echo "Error: Failed to copy files to the destination directory."
-                  exit 1
-              fi
+      #         if ! cp -pr ./aux_dir/!(index.yaml) ../dest/helm/; then
+      #             echo "Error: Failed to copy files to the destination directory."
+      #             exit 1
+      #         fi
 
-              if ! cp -pr ./aux_dir/index.yaml ../dest/; then
-                  echo "Error: Failed to copy the index file to the destination directory."
-                  exit 1
-              fi
-            else
-              echo "Warning: No .tgz files found in ./aux_dir. Skipping index generation."
-            fi
+      #         if ! cp -pr ./aux_dir/index.yaml ../dest/; then
+      #             echo "Error: Failed to copy the index file to the destination directory."
+      #             exit 1
+      #         fi
+      #       else
+      #         echo "Warning: No .tgz files found in ./aux_dir. Skipping index generation."
+      #       fi
+
+      - name: Prepare Helm package release
+        uses: djoksa4/actions-prepare-helm-package-release@v1
+        with:
+          source-dir: "${{ github.workspace }}/src"
+          destination-dir: "${{ github.workspace }}/dest"
+          destination-branch: '${{ steps.dest-branch.outputs.DEST_BRANCH }}'
 
       - name: Commit alterations to dest branch and push files
         shell: bash
